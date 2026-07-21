@@ -1,0 +1,14 @@
+{
+  "name": "hostfence-fetch",
+  "version": "1.1.0",
+  "description": "fetch() wrapper that runs hostfence before every request.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
+  "license": "MIT",
+  "repository": "github:hon900/hostfence-fetch",
+  "engines": { "node": ">=18.18.0" },
+  "dependencies": {
+    "hostfence": "github:hon900/hostfence#v1.2.0"
+  }
+}
