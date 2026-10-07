@@ -4,10 +4,11 @@
 npm install github:hon900/hostfence-fetch#v1.2.0
 ```
 
-A Node.js fetch wrapper that checks the initial URL with
-[hostfence](https://github.com/hon900/hostfence) before sending a request.
-Automatic redirects are disabled so a public URL cannot silently redirect to an
-unchecked internal target. Requires Node.js 18.18 or later.
+A Node.js fetch wrapper that checks the URL with
+[hostfence](https://github.com/hon900/hostfence) and then connects to the
+verified pin address (TLS SNI and Host stay on the original name). Automatic
+redirects are disabled so a public URL cannot hop to an unchecked internal
+target. Requires Node.js 18.18 or later.
 
 ```js
 import { fetchSafe, createFetch, HostfenceError } from "hostfence-fetch";

@@ -1,23 +1,33 @@
-import { Hostfence } from "hostfence";
+import { Agent } from "undici";
+import { Hostfence, pinLookup } from "hostfence";
 
 const fence = new Hostfence();
+const agents = new Map();
 
 export { Hostfence, HostfenceError } from "hostfence";
 
+function dispatcherFor(pin) {
+  const key = `${pin.family}/${pin.address}`;
+  let agent = agents.get(key);
+  if (!agent) {
+    agent = new Agent({ connect: { lookup: pinLookup(pin) } });
+    agents.set(key, agent);
+  }
+  return agent;
+}
+
 async function requestWithFence(local, input, init) {
-  // A Request's default is "follow", so override that inherited default too.
   const redirect = init?.redirect ??
     (input instanceof Request && input.redirect !== "follow" ? input.redirect : "error");
   if (redirect !== "error" && redirect !== "manual") {
     throw new TypeError('hostfence-fetch supports only redirect: "error" or "manual"');
   }
 
-  // Snapshot the URL and request options before an asynchronous DNS check.
   const request = new Request(input, { ...init, redirect });
   request.signal.throwIfAborted();
-  await local.assert(request.url);
+  const { pin } = await local.assertPin(request.url);
   request.signal.throwIfAborted();
-  return fetch(request);
+  return fetch(request, { dispatcher: dispatcherFor(pin) });
 }
 
 export function fetchSafe(input, init) {
